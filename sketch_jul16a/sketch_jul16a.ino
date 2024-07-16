@@ -2,14 +2,8 @@
 const int VRxPin = A0;
 const int VRyPin = A1;
 
-// 매핑 함수: 0~1023 범위를 -1.0~1.0 범위로 변환
-float mapJoystickValue(int value) {
-    return ((float)value - 512.0) / 512.0;
-}
-
 void setup() {
-    // 시리얼 통신 시작
-    Serial.begin(9600);
+    Serial.begin(9600); // 시리얼 통신 시작
 }
 
 void loop() {
@@ -18,13 +12,12 @@ void loop() {
     int yValue = analogRead(VRyPin);
     
     // 0~1023 값을 -1.0~1.0 값으로 변환
-    float xMapped = mapJoystickValue(xValue);
-    float yMapped = mapJoystickValue(yValue);
+    float xMapped = ((float)xValue - 512.0) / 512.0;
+    float yMapped = ((float)yValue - 512.0) / 512.0;
     
-    // 변환된 값 출력
-    Serial.print("X: ");
+    // 변환된 값 전송
     Serial.print(xMapped);
-    Serial.print("\tY: ");
+    Serial.print("\t");
     Serial.println(yMapped);
     
     // 100ms 대기
