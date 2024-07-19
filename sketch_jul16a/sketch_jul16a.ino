@@ -1,25 +1,42 @@
-// 아날로그 입력 핀 정의
-const int VRxPin = A0;
-const int VRyPin = A1;
+const int joyX = A0; // 조이스틱의 X축 핀
+const int joyY = A1; // 조이스틱의 Y축 핀
+const int buttonPin2 = 2; // 버튼 핀
+const int buttonPin3 = 3; // 버튼 핀
+unsigned long startTime = 0;
+unsigned long elapsedTime = 0;
+int xValue, yValue;
 
 void setup() {
-    Serial.begin(9600); // 시리얼 통신 시작
+    Serial.begin(115200);
+    pinMode(joyX, INPUT);
+    pinMode(joyY, INPUT);
+    pinMode(buttonPin2, INPUT_PULLUP); // 버튼 핀 2를 내부 풀업 저항으로 설정
+    pinMode(buttonPin3, INPUT_PULLUP); // 버튼 핀 3을 내부 풀업 저항으로 설정
+    startTime = millis();
 }
 
 void loop() {
-    // 조이스틱 X, Y 값 읽기
-    int xValue = analogRead(VRxPin);
-    int yValue = analogRead(VRyPin);
-    
-    // 0~1023 값을 -1.0~1.0 값으로 변환
-    float xMapped = ((float)xValue - 512.0) / 512.0;
-    float yMapped = ((float)yValue - 512.0) / 512.0;
-    
-    // 변환된 값 전송
-    Serial.print(xMapped);
-    Serial.print("\t");
-    Serial.println(yMapped);
-    
-    // 100ms 대기
-    delay(100);
+    elapsedTime = millis() - startTime;
+    if(elapsedTime <= 3600000){
+        xValue = analogRead(joyX); // X축 값 읽기
+        yValue = analogRead(joyY); // Y축 값 읽기
+    }
+    else{
+        xValue = analogRead(joyY); // X축 값 읽기
+        yValue = analogRead(joyX); // Y축 값 읽기
+    }
+
+    bool button2Pressed = digitalRead(buttonPin2) == LOW;
+    bool button3Pressed = digitalRead(buttonPin3) == LOW;
+
+    // 시리얼로 값 전송
+    Serial.print(xValue);
+    Serial.print(",");
+    Serial.print(yValue);
+    Serial.print(",");
+    Serial.print(button2Pressed ? 1 : 0); // 버튼 2 상태 전송 (1 또는 0)
+    Serial.print(",");
+    Serial.println(button3Pressed ? 1 : 0); // 버튼 3 상태 전송 (1 또는 0)
+    Serial.println(elapsedTime / 1000);
+    delay(10);
 }
